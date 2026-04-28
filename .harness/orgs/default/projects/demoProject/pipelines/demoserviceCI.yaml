@@ -36,6 +36,8 @@ pipeline:
                   name: BuildDotnetApp
                   identifier: BuildDotnetApp
                   spec:
+                    connectorRef: account.harnessImage
+                    image: mcr.microsoft.com/dotnet/sdk:8.0
                     shell: Sh
                     command: |-
                       dotnet restore
