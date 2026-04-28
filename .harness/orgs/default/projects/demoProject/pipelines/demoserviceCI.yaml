@@ -48,7 +48,7 @@ pipeline:
                   identifier: PushToDockerHub
                   spec:
                     connectorRef: demoservicerepo
-                    repo: demoservice
+                    repo: impriya/demoservice
                     tags:
                       - latest
                     dockerfile: DemoService/Dockerfile
