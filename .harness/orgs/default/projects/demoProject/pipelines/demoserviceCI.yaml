@@ -42,3 +42,12 @@ pipeline:
                     command: |-
                       dotnet restore
                       dotnet build --configuration Release
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: PushToDockerHub
+                  identifier: PushToDockerHub
+                  spec:
+                    connectorRef: demoservicerepo
+                    repo: demoservice
+                    tags:
+                      - latest
