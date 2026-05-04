@@ -1,0 +1,49 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: trigger-github-workflow
+  title: Trigger GitHub Workflow
+  description: Run GitHub Actions workflow via Harness pipeline
+
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Provide Inputs
+      required:
+        - repo
+        - branch
+        - workflow
+      properties:
+        repo:
+          title: Repository Name
+          type: string
+          default: demoservice
+
+        branch:
+          title: Branch Name
+          type: string
+          default: main
+
+        workflow:
+          title: Workflow File
+          type: string
+          default: docker-image.yml
+
+  steps:
+    - id: trigger
+      name: Trigger Harness Pipeline
+      action: trigger:harness-pipeline
+      input:
+        pipelineId: github-workflow-trigger   # 👈 your pipeline name
+        inputSet:
+          repo: ${{ parameters.repo }}
+          branch: ${{ parameters.branch }}
+          workflow: ${{ parameters.workflow }}
+
+  output:
+    text:
+      - title: Success
+        content: |
+          GitHub workflow triggered successfully 🚀
