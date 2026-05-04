@@ -2,11 +2,9 @@ name: Build C# DemoService
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,71 +12,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # ✅ Checkout
+    # Checkout
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # ✅ Setup .NET
+    # Setup .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    # ✅ Restore
+    # Restore
     - name: Restore dependencies
       run: dotnet restore DemoService.sln
 
-    # ✅ Build
+    # Build
     - name: Build
       run: dotnet build DemoService.sln --configuration Release --no-restore
 
-    # ✅ Test
+    # Test
     - name: Run tests
       run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # ✅ Install Swagger CLI locally
-    - name: Install Swagger CLI
-      run: dotnet tool install --tool-path . Swashbuckle.AspNetCore.Cli
-
-    # 🔍 Debug: list files (helps confirm structure)
-    - name: List files
-      run: ls -R
-
-    # ✅ Find DLL dynamically + Generate OpenAPI
-    - name: Generate OpenAPI JSON
+    # 🚀 Run app in background
+    - name: Run app
       run: |
-        DLL_PATH=$(find . -type f -name "DemoService.dll" | grep "Release" | head -n 1)
-        
-        if [ -z "$DLL_PATH" ]; then
-          echo "❌ DLL not found!"
-          exit 1
-        fi
-        
-        echo "✅ Using DLL: $DLL_PATH"
-        
-        ./swagger tofile \
-          --output openapi.json \
-          "$DLL_PATH" \
-          v1
+        dotnet run --project DemoService/DemoService.csproj &
+        sleep 15
 
-    # ✅ Convert JSON → YAML
+    # 📥 Download OpenAPI JSON from Swagger endpoint
+    - name: Fetch OpenAPI JSON
+      run: |
+        curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json
+
+    # 🔄 Convert to YAML
     - name: Convert to YAML
       run: |
         npm install -g swagger-cli
         swagger-cli bundle openapi.json --type yaml > openapi.yaml
 
-    # ✅ Upload artifact
+    # 📦 Upload artifact
     - name: Upload OpenAPI Artifact
       uses: actions/upload-artifact@v4
       with:
         name: openapi-spec
         path: openapi.yaml
-
-    # 🔥 OPTIONAL: Commit back to repo
-    # - name: Commit OpenAPI file
-    #   run: |
-    #     git config --global user.name "github-actions"
-    #     git config --global user.email "actions@github.com"
-    #     git add openapi.yaml
-    #     git commit -m "Auto-update OpenAPI spec" || echo "No changes"
-    #     git push
