@@ -36,20 +36,29 @@ jobs:
     - name: Run tests
       run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # ✅ Install Swagger CLI locally (FIXED)
+    # ✅ Install Swagger CLI locally
     - name: Install Swagger CLI
       run: dotnet tool install --tool-path . Swashbuckle.AspNetCore.Cli
 
-    # 🔍 Debug: list build output (helps verify DLL path)
-    - name: List build output
+    # 🔍 Debug: list files (helps confirm structure)
+    - name: List files
       run: ls -R
 
-    # ✅ Generate OpenAPI JSON
+    # ✅ Find DLL dynamically + Generate OpenAPI
     - name: Generate OpenAPI JSON
       run: |
+        DLL_PATH=$(find . -type f -name "DemoService.dll" | grep "Release" | head -n 1)
+        
+        if [ -z "$DLL_PATH" ]; then
+          echo "❌ DLL not found!"
+          exit 1
+        fi
+        
+        echo "✅ Using DLL: $DLL_PATH"
+        
         ./swagger tofile \
           --output openapi.json \
-          ./bin/Release/net8.0/DemoService.dll \
+          "$DLL_PATH" \
           v1
 
     # ✅ Convert JSON → YAML
@@ -58,14 +67,14 @@ jobs:
         npm install -g swagger-cli
         swagger-cli bundle openapi.json --type yaml > openapi.yaml
 
-    # ✅ Upload artifact (download from Actions)
+    # ✅ Upload artifact
     - name: Upload OpenAPI Artifact
       uses: actions/upload-artifact@v4
       with:
         name: openapi-spec
         path: openapi.yaml
 
-    # 🔥 OPTIONAL: Commit back to repo (uncomment if needed)
+    # 🔥 OPTIONAL: Commit back to repo
     # - name: Commit OpenAPI file
     #   run: |
     #     git config --global user.name "github-actions"
