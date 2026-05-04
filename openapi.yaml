@@ -1,7 +1,8 @@
 openapi: 3.0.1
 info:
   title: DemoService
-  version: '1.0'
+  version: "1.0"
+
 paths:
   /WeatherForecast:
     get:
@@ -9,24 +10,15 @@ paths:
         - WeatherForecast
       operationId: GetWeatherForecast
       responses:
-        '200':
+        "200":
           description: OK
           content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WeatherForecast'
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WeatherForecast'
-            text/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WeatherForecast'
+                  $ref: "#/components/schemas/WeatherForecast"
+
 components:
   schemas:
     WeatherForecast:
@@ -37,13 +29,9 @@ components:
           format: date
         temperatureC:
           type: integer
-          format: int32
         temperatureF:
           type: integer
-          format: int32
           readOnly: true
         summary:
           type: string
           nullable: true
-      additionalProperties: false
-
