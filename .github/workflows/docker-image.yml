@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:   # 👈 REQUIRED for Harness/API trigger
 
 jobs:
   build:
@@ -14,10 +15,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4   # ✅ updated version
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4   # ✅ updated version
       with:
         dotnet-version: '8.0.x'
 
@@ -25,4 +26,7 @@ jobs:
       run: dotnet restore DemoService.sln
 
     - name: Build
-      run: dotnet build DemoService.sln --configuration Release
+      run: dotnet build DemoService.sln --configuration Release --no-restore
+
+    - name: Run tests (optional)
+      run: dotnet test DemoService.sln --no-build --verbosity normal
