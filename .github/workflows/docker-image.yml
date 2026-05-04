@@ -14,35 +14,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # ✅ Checkout
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # ✅ Setup .NET
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
+    # ✅ Restore
     - name: Restore dependencies
       run: dotnet restore DemoService.sln
 
+    # ✅ Build
     - name: Build
       run: dotnet build DemoService.sln --configuration Release --no-restore
 
-    - name: Run tests (optional)
+    # ✅ Test
+    - name: Run tests
       run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # ✅ Install Swagger CLI
+    # ✅ Install Swagger CLI locally (FIXED)
     - name: Install Swagger CLI
-      run: dotnet tool install --global Swashbuckle.AspNetCore.Cli
+      run: dotnet tool install --tool-path . Swashbuckle.AspNetCore.Cli
 
-    # ✅ Add .NET tools to PATH
-    - name: Add .NET tools to PATH
-      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+    # 🔍 Debug: list build output (helps verify DLL path)
+    - name: List build output
+      run: ls -R
 
     # ✅ Generate OpenAPI JSON
     - name: Generate OpenAPI JSON
       run: |
-        dotnet swagger tofile \
+        ./swagger tofile \
           --output openapi.json \
           ./bin/Release/net8.0/DemoService.dll \
           v1
@@ -53,9 +58,18 @@ jobs:
         npm install -g swagger-cli
         swagger-cli bundle openapi.json --type yaml > openapi.yaml
 
-    # ✅ Upload artifact (so you can download/test)
+    # ✅ Upload artifact (download from Actions)
     - name: Upload OpenAPI Artifact
       uses: actions/upload-artifact@v4
       with:
         name: openapi-spec
         path: openapi.yaml
+
+    # 🔥 OPTIONAL: Commit back to repo (uncomment if needed)
+    # - name: Commit OpenAPI file
+    #   run: |
+    #     git config --global user.name "github-actions"
+    #     git config --global user.email "actions@github.com"
+    #     git add openapi.yaml
+    #     git commit -m "Auto-update OpenAPI spec" || echo "No changes"
+    #     git push
