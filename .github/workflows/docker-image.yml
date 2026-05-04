@@ -34,13 +34,18 @@ jobs:
     - name: Run tests
       run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # 🚀 Run app in background
+    # 🚀 Run app on FIXED port
     - name: Run app
       run: |
-        dotnet run --project DemoService/DemoService.csproj &
-        sleep 15
+        dotnet run --project DemoService/DemoService.csproj --urls=http://localhost:5000 &
+        sleep 20
 
-    # 📥 Download OpenAPI JSON from Swagger endpoint
+    # 🔍 Debug: check if app is running
+    - name: Check running process
+      run: |
+        ps -ef | grep dotnet
+
+    # 📥 Fetch OpenAPI JSON
     - name: Fetch OpenAPI JSON
       run: |
         curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json
