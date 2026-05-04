@@ -1,14 +1,11 @@
 apiVersion: backstage.io/v1alpha1
-kind: Component
+kind: API
 metadata:
-  name: demoservice
-  description: .NET microservice
-  annotations:
-    github.com/project-slug: jagtappriyanka007/demoservice
-    backstage.io/techdocs-ref: dir:.
+  name: demo-service-api
+  description: Demo API
 spec:
-  type: service
-  owner: group:platform-team
+  type: openapi
   lifecycle: production
-  providesApis:
-    - demoservice-api
+  owner: user:guest
+  definition:
+    $text: ./openapi.yaml
