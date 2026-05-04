@@ -1,0 +1,4 @@
+site_name: Demo Service Documentation
+
+nav:
+  - Home: index.md
