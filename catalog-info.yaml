@@ -3,6 +3,9 @@ kind: API
 metadata:
   name: demo-service-api-1
   description: Demo API
+annotations:
+  orgIdentifier: WiproPOC
+  projectIdentifier: CSDemo
 spec:
   type: openapi
   lifecycle: production
