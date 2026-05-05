@@ -4,6 +4,7 @@ metadata:
   name: demo-service-api-1
   description: Demo API
 annotations:
+  accountIdentifier: 2KolbecvR0aAcgQ5uXBObA
   orgIdentifier: WiproPOC
   projectIdentifier: CSDemo
 spec:
