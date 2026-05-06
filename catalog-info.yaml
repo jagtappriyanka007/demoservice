@@ -10,6 +10,6 @@ annotations:
 spec:
   type: openapi
   lifecycle: production
-  owner: group:SRE-SRE
+  owner: group:sre
   definition:
     $text: ./openapi.yaml
