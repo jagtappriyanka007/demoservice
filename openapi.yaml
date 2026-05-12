@@ -3,6 +3,12 @@ info:
   title: DemoService
   version: "1.0"
 
+servers:
+  - url: http://localhost:5000
+    description: Local
+  - url: https://api.demo.com
+    description: Prod
+
 paths:
   /WeatherForecast:
     get:
@@ -29,9 +35,6 @@ components:
           format: date
         temperatureC:
           type: integer
-        temperatureF:
-          type: integer
-          readOnly: true
         summary:
           type: string
-          nullable: true
+
