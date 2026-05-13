@@ -1,3 +1,4 @@
+```yaml
 name: Build C# DemoService
 
 on:
@@ -7,14 +8,20 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+
     # Checkout
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     # Setup .NET
     - name: Setup .NET
@@ -34,31 +41,47 @@ jobs:
     - name: Run tests
       run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # 🚀 Run app on FIXED port
+    # Run app
     - name: Run app
       run: |
         dotnet run --project DemoService/DemoService.csproj --urls=http://localhost:5000 &
         sleep 20
 
-    # 🔍 Debug: check if app is running
+    # Check running process
     - name: Check running process
       run: |
         ps -ef | grep dotnet
 
-    # 📥 Fetch OpenAPI JSON
+    # Fetch OpenAPI JSON
     - name: Fetch OpenAPI JSON
       run: |
         curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json
 
-    # 🔄 Convert to YAML
+    # Convert JSON to YAML
     - name: Convert to YAML
       run: |
         npm install -g swagger-cli
         swagger-cli bundle openapi.json --type yaml > openapi.yaml
 
-    # 📦 Upload artifact
+    # Commit updated openapi.yaml
+    - name: Commit updated OpenAPI spec
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        git add openapi.yaml
+
+        git diff --cached --quiet || git commit -m "Auto-update OpenAPI spec"
+
+    # Push updated file to GitHub
+    - name: Push changes
+      run: |
+        git push origin main
+
+    # Upload artifact
     - name: Upload OpenAPI Artifact
       uses: actions/upload-artifact@v4
       with:
         name: openapi-spec
         path: openapi.yaml
+```
