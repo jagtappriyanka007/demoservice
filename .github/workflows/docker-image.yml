@@ -93,7 +93,8 @@ jobs:
           docker build -f Demoservice/Dockerfile \
           -t impriya/demoservice:latest \
           -t impriya/demoservice:${{ github.sha }} \
-
+          .
+           
       # ✅ Push Docker Image
       - name: Push Docker Image
         run: |
