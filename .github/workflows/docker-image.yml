@@ -15,71 +15,90 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    # Checkout
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      # Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-    # Setup .NET
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      # Restore
+      - name: Restore dependencies
+        run: dotnet restore DemoService.sln
 
-    # Restore
-    - name: Restore dependencies
-      run: dotnet restore DemoService.sln
+      # Build
+      - name: Build
+        run: dotnet build DemoService.sln --configuration Release --no-restore
 
-    # Build
-    - name: Build
-      run: dotnet build DemoService.sln --configuration Release --no-restore
+      # Test
+      - name: Run tests
+        run: dotnet test DemoService.sln --no-build --verbosity normal
 
-    # Test
-    - name: Run tests
-      run: dotnet test DemoService.sln --no-build --verbosity normal
+      # Run app
+      - name: Run app
+        run: |
+          dotnet run --project DemoService/DemoService.csproj --urls=http://localhost:5000 &
+          sleep 20
 
-    # Run app
-    - name: Run app
-      run: |
-        dotnet run --project DemoService/DemoService.csproj --urls=http://localhost:5000 &
-        sleep 20
+      # Check running process
+      - name: Check running process
+        run: |
+          ps -ef | grep dotnet
 
-    # Check running process
-    - name: Check running process
-      run: |
-        ps -ef | grep dotnet
+      # Fetch OpenAPI JSON
+      - name: Fetch OpenAPI JSON
+        run: |
+          curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json
 
-    # Fetch OpenAPI JSON
-    - name: Fetch OpenAPI JSON
-      run: |
-        curl http://localhost:5000/swagger/v1/swagger.json -o openapi.json
+      # Convert JSON to YAML
+      - name: Convert to YAML
+        run: |
+          npm install -g swagger-cli
+          swagger-cli bundle openapi.json --type yaml > openapi.yaml
 
-    # Convert JSON to YAML
-    - name: Convert to YAML
-      run: |
-        npm install -g swagger-cli
-        swagger-cli bundle openapi.json --type yaml > openapi.yaml
+      # Commit updated openapi.yaml
+      - name: Commit updated OpenAPI spec
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
 
-    # Commit updated openapi.yaml
-    - name: Commit updated OpenAPI spec
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
+          git add openapi.yaml
+          git diff --cached --quiet || git commit -m "Auto-update OpenAPI spec"
 
-        git add openapi.yaml
+      # Push updated file to GitHub
+      - name: Push changes
+        run: |
+          git push origin main
 
-        git diff --cached --quiet || git commit -m "Auto-update OpenAPI spec"
+      # Upload artifact
+      - name: Upload OpenAPI Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: openapi.yaml
 
-    # Push updated file to GitHub
-    - name: Push changes
-      run: |
-        git push origin main
+      # ✅ Login to DockerHub
+      - name: Login to Docker
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # Upload artifact
-    - name: Upload OpenAPI Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: openapi-spec
-        path: openapi.yaml
+      # ✅ Build Docker Image
+      - name: Build Docker Image
+        run: |
+          docker build -t impriya/demoservice:latest .
+          docker build -t impriya/demoservice:${{ github.sha }} .
+
+      # ✅ Push Docker Image
+      - name: Push Docker Image
+        run: |
+          docker push impriya/demoservice:latest
+          docker push impriya/demoservice:${{ github.sha }}
+
+      # ✅ Print image info
+      - name: Image Info
+        run: echo "Pushed images impriya/demoservice:latest and impriya/demoservice:${{ github.sha }}"
