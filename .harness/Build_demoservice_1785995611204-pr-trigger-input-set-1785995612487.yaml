@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_demoservice_1785995611204-pr-trigger-input-set
+  identifier: Build_demoservice_1785995611204prtriggerinputset
+  orgIdentifier: WiproPOC
+  projectIdentifier: CSDemo
+  pipeline:
+    identifier: Build_demoservice_1785995611204
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
