@@ -19,16 +19,13 @@ pipeline:
                   spec:
                     shell: Python
                     command: |-
-                      echo "Welcome to Harness CI"
-                      cat <<EOF > hello.py
-                      print("=================================")
-                      print("     HARNESS PYTHON DEMO")
-                      print("=================================")
-                      print("Welcome to Harness CI Pipeline")
-                      print("Python script executed successfully")
-                      print("Learning DevOps and Automation")
-                      print("=================================")
+                      python3 --version
+
+                      cat > hello.py <<EOF
+                      print('Hello Harness')
                       EOF
+
+                      python3 hello.py
                   description: Myfirst Dmeo
           platform:
             os: Linux
