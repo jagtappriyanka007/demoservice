@@ -14,11 +14,24 @@ pipeline:
             steps:
               - step:
                   type: Run
-                  name: Echo Welcome Message
+                  name: Demo2
                   identifier: Echo_Welcome_Message
                   spec:
-                    shell: Sh
-                    command: echo "Welcome to Harness CI"
+                    shell: Bash
+                    command: |-
+                      echo "================================="
+                      echo " HARNESS CI DEMO"
+                      echo "================================="
+                      echo "Project Name : CSDemo"
+                      echo "Pipeline Name: Build demoservice"
+                      echo "Build Started Successfully"
+                      echo "Current Date : $(date)"
+                      echo "Current User : $(whoami)"
+                      echo "Working Directory : $(pwd)"
+                      echo "================================="
+                      echo "Demo Completed Successfully"
+                      echo "================================="
+                  description: FirstDemo
           platform:
             os: Linux
             arch: Amd64
