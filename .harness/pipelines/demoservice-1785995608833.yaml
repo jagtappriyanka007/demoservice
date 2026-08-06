@@ -18,14 +18,7 @@ pipeline:
                   identifier: Echo_Welcome_Message
                   spec:
                     shell: Python
-                    command: |-
-                      python3 --version
-
-                      cat > hello.py <<EOF
-                      print('Hello Harness')
-                      EOF
-
-                      python3 hello.py
+                    command: python3 -c "print('Hello from Harness CI Pipeline')"
                   description: Myfirst Dmeo
           platform:
             os: Linux
