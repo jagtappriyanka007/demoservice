@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_demoservice_1785998924537-push-trigger-input-set
+  identifier: Build_demoservice_1785998924537pushtriggerinputset
+  orgIdentifier: WiproPOC
+  projectIdentifier: CSDemo
+  pipeline:
+    identifier: Build_demoservice_1785998924537
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
