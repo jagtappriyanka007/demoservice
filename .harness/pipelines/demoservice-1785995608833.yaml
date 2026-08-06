@@ -29,8 +29,6 @@ pipeline:
                       print("Learning DevOps and Automation")
                       print("=================================")
                       EOF
-
-                      python3 hello.py
                   description: Myfirst Dmeo
           platform:
             os: Linux
