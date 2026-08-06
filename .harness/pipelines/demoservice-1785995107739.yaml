@@ -1,0 +1,33 @@
+pipeline:
+  name: Build demoservice
+  identifier: Build_demoservice_1785995144699
+  projectIdentifier: CSDemo
+  orgIdentifier: WiproPOC
+  stages:
+    - stage:
+        name: Build
+        identifier: Build
+        type: CI
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Echo Welcome Message
+                  identifier: Echo_Welcome_Message
+                  spec:
+                    shell: Sh
+                    command: echo "Welcome to Harness CI"
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: demorepo
+        repoName: demoservice
+        build: <+input>
